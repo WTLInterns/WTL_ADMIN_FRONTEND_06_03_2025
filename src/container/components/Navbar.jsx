@@ -84,6 +84,54 @@ const Layout = ({ children }) => {
             )}
           </li>
 
+
+
+      {/* B2B Dropdown */}
+<li className="relative">
+            <button
+              onClick={() => toggleDropdown("b2b")}
+              className="flex items-center justify-between w-full py-2 px-4 hover:bg-blue-500 rounded"
+            >
+              B2B
+              <FaChevronDown
+                className={`ml-2 transform ${openDropdown === "b2b" ? "rotate-180" : ""}`}
+              />
+            </button>
+            {openDropdown === "b2b" && (
+              <ul className="mt-2 bg-white text-gray-700 rounded shadow-md w-full">
+                <li>
+                  <Link
+                    href="/B2B/All_B2B"
+                    className="flex items-center py-2 px-4 hover:bg-blue-100 rounded"
+                  >
+                    <FaBusinessTime className="mr-2" />
+                    All B2B
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/B2B/B2B_Request"
+                    className="flex items-center py-2 px-4 hover:bg-blue-100 rounded"
+                  >
+                    <FaCheck className="mr-2" />
+                    Request B2B
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/B2B/B2B_Report"
+                    className="flex items-center py-2 px-4 hover:bg-blue-100 rounded"
+                  >
+                    <FaUsers className="mr-2" />
+                    B2B Report
+                  </Link>
+                </li>
+                
+              </ul>
+            )}
+          </li>
+
+
           {/* {Fleet Section} */}
           <button
             onClick={() => toggleDropdown("Fleet")}
