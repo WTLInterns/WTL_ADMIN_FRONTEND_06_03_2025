@@ -27,18 +27,18 @@ const AddDriverModal = ({ isOpen, onClose }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       [name]: value,
-    });
+    }));
   };
 
   const handleFileChange = (e) => {
     const { name, files: selectedFiles } = e.target;
-    setFiles({
-      ...files,
+    setFiles((prev) => ({
+      ...prev,
       [name]: selectedFiles[0], // Store the first selected file
-    });
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -65,7 +65,7 @@ const AddDriverModal = ({ isOpen, onClose }) => {
 
     try {
       const response = await axios.post(
-        "https://worldtriplink.com/driverAdmin/save",
+        "http://localhost:8080/driverAdmin/save",
         data,
         {
           headers: {
@@ -73,28 +73,36 @@ const AddDriverModal = ({ isOpen, onClose }) => {
           },
         }
       );
-      alert("Drive saved successfully!");
+      alert("Driver saved successfully!");
       console.log(response.data);
     } catch (error) {
-      console.error("Error saving vehicle:", error);
-      alert("Failed to save vehicle. Please try again.");
+      console.error("Error saving driver:", error);
+      alert("Failed to save driver. Please try again.");
     }
   };
+
   if (!isOpen) return null;
 
-  // ✅ Handle Reset Form
+  // ✅ Handle Reset Form with consistent keys
   const handleReset = () => {
     setFormData({
-      driverName: "",
-      contactNo: "",
-      alternateNo: "",
-      email: "",
-      address: "",
-      adhaar: null,
-      dlNo: null,
-      pvcNo: null,
-      selfie: null,
+      DriverName: "",
+      ContactNo: "",
+      AltMobNum: "",
+      emailId: "",
+      Adress: "",
+      aadhaNo: "",
+      drLicenseNo: "",
+      pvcNo2: "",
       otherDetails: "",
+      status: "",
+    });
+    setFiles({
+      DriverImgSelfie: null,
+      Aadhar: null,
+      authorizationImage: null,
+      DrLicenceNum: null,
+      PvcNo: null,
     });
   };
 
@@ -115,8 +123,6 @@ const AddDriverModal = ({ isOpen, onClose }) => {
         <h2 className="text-xl font-semibold mb-4 text-center">
           Add Driver Form
         </h2>
-
-        {/* Scrollable Content */}
 
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[60vh] overflow-y-auto px-2">
@@ -155,7 +161,13 @@ const AddDriverModal = ({ isOpen, onClose }) => {
 
             <div>
               <label className="font-medium">Driver's Email ID</label>
-              <input type="email" className="border p-2 rounded-md w-full" />
+              <input
+                type="email"
+                name="emailId"
+                value={formData.emailId}
+                onChange={handleChange}
+                className="border p-2 rounded-md w-full"
+              />
             </div>
 
             <div className="md:col-span-2">
@@ -244,24 +256,27 @@ const AddDriverModal = ({ isOpen, onClose }) => {
           </div>
           <div className="flex gap-3 mt-4">
             <button
+              type="button"
               onClick={onClose}
               className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition"
             >
               Close
             </button>
             <button
+              type="button"
               onClick={handleReset}
               className="bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-500 transition"
             >
               Reset
             </button>
-            <button className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition">
+            <button
+              type="submit"
+              className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition"
+            >
               Submit
             </button>
           </div>
         </form>
-
-        {/* ✅ Buttons Section */}
       </div>
     </div>
   );

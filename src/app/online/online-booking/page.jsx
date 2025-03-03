@@ -33,7 +33,7 @@ export default function Bookings() {
 
   const fetchBookings = async () => {
     try {
-      const response = await axios.get("https://worldtriplink.com/details");
+      const response = await axios.get("http://localhost:8080/details");
       if (response.status === 200 && Array.isArray(response.data)) {
         setBookings(response.data);
         setFilteredBookings(response.data);
@@ -55,21 +55,23 @@ export default function Bookings() {
     );
     if (!confirmed) return;
 
-    setDeleting(true);
-    setError(null);
-    setSuccessMessage(null);
+    // setDeleting(true);
+    // setError(null);
+    // setSuccessMessage(null);
 
     try {
-      await axios.delete(`https://worldtriplink.com/delete/${bookingId}`);
-      setBookings((prevBookings) =>
-        prevBookings.filter((booking) => booking.bookingId !== bookingId)
-      );
-      setFilteredBookings((prevFiltered) =>
-        prevFiltered.filter((booking) => booking.bookingId !== bookingId)
-      );
-      setSuccessMessage(
-        `Booking with ID ${bookingId} has been deleted successfully.`
-      );
+      await axios.delete(`http://localhost:8080/delete/${bookingId}`);
+      // setBookings((prevBookings) =>
+      //   prevBookings.filter((booking) => booking.bookingId !== bookingId)
+      // );
+      // setFilteredBookings((prevFiltered) =>
+      //   prevFiltered.filter((booking) => booking.bookingId !== bookingId)
+      // );
+      // setSuccessMessage(
+      //   `Booking with ID ${bookingId} has been deleted successfully.`
+      // );
+
+      fetchBookings();
     } catch (error) {
       setError("Error deleting booking");
     } finally {
@@ -80,7 +82,7 @@ export default function Bookings() {
   const handleUpdateStatus = async (newStatus) => {
     try {
       const response = await axios.put(
-        `https://worldtriplink.com/${bookingId}/status`,
+        `http://localhost:8080/${bookingId}/status`,
         { status: newStatus }
       );
       setBooking(response.data);

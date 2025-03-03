@@ -2,7 +2,7 @@
 import { FaPlus, FaArrowRight } from "react-icons/fa";
 import React, { useEffect, useState } from "react";
 import Navbar from "../../../container/components/Navbar";
-import Outsourceform from "../../../container/components/Outsourceform"
+import Outsourceform from "../../../container/components/Outsourceform";
 import { useRouter } from "next/navigation";
 // Dummy Data
 const cabData = [
@@ -41,7 +41,7 @@ const Page = () => {
 
   useEffect(() => {
     // Fetching data from the backend
-    fetch("https://worldtriplink.com/vehicle/all") // Make sure this URL matches your backend API
+    fetch("http://localhost:8080/vehicle/all") // Make sure this URL matches your backend API
       .then((response) => response.json())
       .then((data) => {
         setSource(data);
@@ -87,8 +87,7 @@ const Page = () => {
             {/* Header Section */}
             <div className="bg-gray-100 p-4 flex items-center justify-between rounded-lg shadow">
               <h2 className="font-semibold text-lg flex items-center">
-                <span className="mr-2">🚖</span> All Outsource Cars | Cabs
-                Details
+                <span className="mr-2">🚖</span> All Outsource Details Details
               </h2>
               <button
                 className="border p-2 rounded-md bg-gray-200 hover:bg-gray-300"
@@ -170,7 +169,7 @@ const Page = () => {
                           {" "}
                           {source.carImage && (
                             <img
-                              src={`https://worldtriplink.com/images/outSourceImg/${source.carImage}`} // Prepend the static URL
+                              src={`http://localhost:8080/images/outSourceImg/${source.carImage}`} // Prepend the static URL
                               alt="Car"
                               className="w-16 h-16 object-cover"
                             />

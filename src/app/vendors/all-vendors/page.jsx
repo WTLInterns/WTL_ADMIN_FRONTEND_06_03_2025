@@ -20,6 +20,7 @@ const AllVendors = () => {
     ifscCode: "",
     aadharNo: "",
     panNo: "",
+    password: "", // Password field added
     udyogAadharNo: "",
     govtApprovalCertificate: null,
     vendorImage: null,
@@ -35,7 +36,7 @@ const AllVendors = () => {
       setLoading(true);
       try {
         const response = await fetch(
-          "https://worldtriplink.com/vendors/allVendors"
+          "http://localhost:8080/vendors/allVendors"
         );
         const data = await response.json();
         setVendors(data);
@@ -44,11 +45,14 @@ const AllVendors = () => {
       }
       setLoading(false);
     };
+
     fetchVendors();
   }, []);
 
+  console.log(vendors);
+
   const handleFileChange = (e) => {
-    setNewVendor({ ...newVendor, [e.target.name]: e.target.files[0] });
+    setNewVendor((prev) => ({ ...prev, [e.target.name]: e.target.files[0] }));
   };
 
   const handleSubmit = async (e) => {
@@ -62,7 +66,7 @@ const AllVendors = () => {
     });
 
     try {
-      const response = await fetch("https://worldtriplink.com/vendors/add", {
+      const response = await fetch("http://localhost:8080/vendors/add", {
         method: "POST",
         body: formData,
       });
@@ -70,12 +74,8 @@ const AllVendors = () => {
       if (response.ok) {
         alert("Vendor added successfully");
         setShowForm(false);
-
-        // Fetch the updated vendor list
         const updatedVendor = await response.json();
-        setVendors([...vendors, updatedVendor]);
-
-        // Reset the form
+        setVendors((prev) => [...prev, updatedVendor]);
         setNewVendor({
           vendorCompanyName: "",
           contactNo: "",
@@ -87,9 +87,9 @@ const AllVendors = () => {
           ifscCode: "",
           aadharNo: "",
           panNo: "",
+          password: "", // Clear the password field after submission
           udyogAadharNo: "",
           govtApprovalCertificate: null,
-          vendorDocs: null,
           vendorImage: null,
           aadharPhoto: null,
           panPhoto: null,
@@ -105,14 +105,11 @@ const AllVendors = () => {
   };
 
   const handleDelete = async (vendorId) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this vendor?"
-    );
-    if (!confirmDelete) return;
+    if (!window.confirm("Are you sure you want to delete this vendor?")) return;
 
     try {
       const response = await fetch(
-        `https://worldtriplink.com/vendors/delete/${vendorId}`,
+        `http://localhost:8080/vendors/delete/${vendorId}`,
         {
           method: "DELETE",
         }
@@ -120,7 +117,7 @@ const AllVendors = () => {
 
       if (response.ok) {
         alert("Vendor deleted successfully");
-        setVendors(vendors.filter((vendor) => vendor.id !== vendorId));
+        setVendors((prev) => prev.filter((vendor) => vendor.id !== vendorId));
       } else {
         alert("Error deleting vendor");
       }
@@ -129,6 +126,11 @@ const AllVendors = () => {
       alert("An error occurred. Please try again.");
     }
   };
+
+  // Filter vendors based on the search input
+  const filteredVendors = vendors.filter((vendor) =>
+    vendor.vendorCompanyName.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <Navbar>
@@ -178,6 +180,21 @@ const AllVendors = () => {
                       className="p-2 border border-gray-300 rounded-lg"
                       onChange={handleFileChange}
                     />
+                  ) : key === "password" ? (
+                    <input
+                      id={key}
+                      name={key}
+                      type="password"
+                      placeholder="Enter password"
+                      className="p-2 border border-gray-300 rounded-lg"
+                      value={newVendor[key]}
+                      onChange={(e) =>
+                        setNewVendor((prev) => ({
+                          ...prev,
+                          [key]: e.target.value,
+                        }))
+                      }
+                    />
                   ) : (
                     <input
                       id={key}
@@ -188,14 +205,16 @@ const AllVendors = () => {
                       className="p-2 border border-gray-300 rounded-lg"
                       value={newVendor[key]}
                       onChange={(e) =>
-                        setNewVendor({ ...newVendor, [key]: e.target.value })
+                        setNewVendor((prev) => ({
+                          ...prev,
+                          [key]: e.target.value,
+                        }))
                       }
                     />
                   )}
                 </div>
               ))}
             </div>
-
             <button
               type="submit"
               className="mt-4 bg-green-600 text-white px-6 py-2 rounded-lg"
@@ -224,7 +243,7 @@ const AllVendors = () => {
                 </tr>
               </thead>
               <tbody>
-                {vendors.map((vendor) => (
+                {filteredVendors.map((vendor) => (
                   <tr key={vendor.id} className="border-b bg-gray-100">
                     <td className="p-3">{vendor.vendorCompanyName}</td>
                     <td className="p-3">{vendor.contactNo}</td>

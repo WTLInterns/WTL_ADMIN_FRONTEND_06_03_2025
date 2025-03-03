@@ -84,17 +84,17 @@ const Layout = ({ children }) => {
             )}
           </li>
 
-
-
-      {/* B2B Dropdown */}
-<li className="relative">
+          {/* B2B Dropdown */}
+          <li className="relative">
             <button
               onClick={() => toggleDropdown("b2b")}
               className="flex items-center justify-between w-full py-2 px-4 hover:bg-blue-500 rounded"
             >
               B2B
               <FaChevronDown
-                className={`ml-2 transform ${openDropdown === "b2b" ? "rotate-180" : ""}`}
+                className={`ml-2 transform ${
+                  openDropdown === "b2b" ? "rotate-180" : ""
+                }`}
               />
             </button>
             {openDropdown === "b2b" && (
@@ -126,11 +126,9 @@ const Layout = ({ children }) => {
                     B2B Report
                   </Link>
                 </li>
-                
               </ul>
             )}
           </li>
-
 
           {/* {Fleet Section} */}
           <button
@@ -284,6 +282,14 @@ const Layout = ({ children }) => {
                 </li>
               </ul>
             )}
+          </li>
+          <li>
+            <Link
+              href="/vendors/reset"
+              className="block py-2 px-4 hover:bg-blue-500 rounded"
+            >
+              Reset Password
+            </Link>
           </li>
         </ul>
       </div>

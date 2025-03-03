@@ -1,72 +1,97 @@
-// app/login/page.js
-'use client';
+"use client";
 
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState } from "react";
+import axios from "axios";
+import { FaEnvelope, FaLock } from "react-icons/fa";
+import { useRouter } from "next/navigation";
 
 export default function Login() {
+  // State to store username and password input
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [user, setUser] = useState(null); // Store user response data
+
+  // Router for redirection
   const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
+  // Function to handle form submission
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // Prevent default form submission
 
-    // Simulating login process
-    if (email === 'test@example.com' && password === 'password') {
-      // Store login state in localStorage (or use cookies/session storage)
-      localStorage.setItem('isLoggedIn', 'true');
+    try {
+      // Make POST request to login API
+      const response = await axios.post("http://localhost:8080/wtlLogin", {
+        username,
+        password,
+      });
 
-      // Redirect to the home page
-      router.push('/');
-    } else {
-      setError('Invalid email or password.');
+      // Get user data from response and store it
+      const data = response.data;
+      setUser(data);
+
+      // Store user data in localStorage
+      localStorage.setItem("user", JSON.stringify(data));
+
+      // If the response contains a redirectUrl, use it; otherwise redirect to home page
+      if (data.redirectUrl) {
+        router.push(data.redirectUrl);
+      } else {
+        router.push("/dashboard");
+      }
+
+      console.log("Login successful:", data);
+    } catch (error) {
+      console.error("Login failed:", error);
+      // Optionally handle error display to the user here
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md p-8 bg-white rounded shadow-md">
-        <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">Login</h2>
-        {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
-        <form onSubmit={handleLogin} className="space-y-4">
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+      <h2 className="text-3xl font-bold text-gray-800 mb-6 mt-[-40px]">
+        Login
+      </h2>
+      <form onSubmit={handleSubmit} className="w-full max-w-xl space-y-5 mt-[-20px]">
+        {/* Username Field */}
+        <div className="relative">
+          <div className="absolute inset-y-0 left-6 flex items-center text-gray-500">
+            <FaEnvelope className="mr-2" />
+            <span>Username</span>
           </div>
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+          <input
+            type="text"
+            className="w-full pl-32 pr-5 py-3 border border-gray-300 rounded-full shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            placeholder="your username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+          />
+        </div>
+
+        {/* Password Field */}
+        <div className="relative">
+          <div className="absolute inset-y-0 left-6 flex items-center text-gray-500">
+            <FaLock className="mr-2" />
+            <span>Password</span>
           </div>
-          <button
-            type="submit"
-            className="w-full py-2 px-4 text-white bg-blue-600 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none rounded-md shadow-md"
-          >
-            Login
-          </button>
-        </form>
-      </div>
+          <input
+            type="password"
+            className="w-full pl-36 pr-5 py-3 border border-gray-300 rounded-full shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            placeholder="••••••••"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
+
+        {/* Submit Button */}
+        <button
+          type="submit"
+          className="w-full py-4 text-white bg-green-600 hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none rounded-full shadow-md"
+        >
+          Submit
+        </button>
+      </form>
     </div>
   );
 }

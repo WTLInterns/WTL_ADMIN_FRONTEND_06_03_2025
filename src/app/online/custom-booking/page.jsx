@@ -1,33 +1,43 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 import Navbar from "../../../container/components/Navbar";
 import { FaPlus, FaTimes } from "react-icons/fa";
+import { useRouter } from "next/navigation";
 
 const Bookings = () => {
+  // Form states
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [tripType, setTripType] = useState("One Way");
+  const [tripType, setTripType] = useState("oneWay");
   const [userPickup, setUserPickUp] = useState("");
   const [userDrop, setUserDrop] = useState("");
   const [startDate, setStartDate] = useState("");
   const [time, setTime] = useState("");
-  const [returnDate, setReturnDate] = useState(""); // For round trips
-  const [car, setCar] = useState("Sedan"); // Default car type
-  const [amount, setAmount] = useState(""); // Allow manual price input
+  const [returnDate, setReturnDate] = useState("");
+  const [car, setCar] = useState("Sedan");
+  const [amount, setAmount] = useState("");
+  const [deleting, setDeleting] = useState(false);
+  const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
 
+  const router = useRouter();
+
+  // Bookings from backend
   const [bookings, setBookings] = useState([]);
 
-  // Handle form submission
+  // Filter state for trip type (all, One Way, Round Trip)
+  const [filterTrip, setFilterTrip] = useState("all");
+
+  // Form submission handler (ensuring bookingType is set to "custom_booking")
   const handleSubmit = async (event) => {
     event.preventDefault();
-
-    // Check if required fields are filled before submitting
     if (!userPickup || !userDrop || !startDate || !time || !amount) {
       alert("Please fill in all required fields.");
       return;
     }
-
     const bookingData = {
+      bookingType: "custom_booking", // enforce custom booking type
       tripType,
       userPickup,
       userDrop,
@@ -35,27 +45,21 @@ const Bookings = () => {
       time,
       returnDate,
       car,
-      amount: parseFloat(amount), // Ensure the amount is a valid number
+      amount: parseFloat(amount),
     };
 
-    console.log("Booking Data to be sent:", bookingData); // Log before sending
-
     try {
-      const response = await fetch("https://worldtriplink.com/customBooking", {
+      const response = await fetch("http://localhost:8080/customBooking", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(bookingData), // Send data to backend
+        body: JSON.stringify(bookingData),
       });
-
-      console.log("Response from server:", response); // Log the response
-
       if (response.ok) {
-        const newBooking = await response.json(); // Get the new booking data from the server
-        console.log("New booking data:", newBooking); // Log the received new booking data
-        setBookings([...bookings, newBooking]); // Add new booking to the list
-        setIsFormOpen(false); // Close the form
+        const newBooking = await response.json();
+        setBookings([...bookings, newBooking]);
+        setIsFormOpen(false);
       } else {
         console.error("Failed to add booking");
       }
@@ -64,30 +68,62 @@ const Bookings = () => {
     }
   };
 
-  const [booking, setBooking] = useState([]);
+  // Fetch bookings from the backend
   const fetchBookings = async () => {
     try {
-      const response = await axios.get("https://worldtriplink.com/details");
+      const response = await axios.get("http://localhost:8080/details");
       if (response.status === 200 && Array.isArray(response.data)) {
-        setBooking(response.data);
-        // setFilteredBookings(response.data);
+        setBookings(response.data);
       } else {
-        setBooking([]);
-        // setError("Invalid response structure");
+        setBookings([]);
       }
     } catch (error) {
-      // setError("Error fetching bookings");
+      console.error("Error fetching bookings", error);
       setBookings([]);
-    } finally {
-      // setLoading(false);
     }
   };
-
-  console.log(booking);
 
   useEffect(() => {
     fetchBookings();
   }, []);
+
+  // Filter bookings to show only custom bookings and then by trip type if needed.
+  const filteredBookings = bookings.filter((b) => {
+    return (
+      b.bookingType === "custom_booking" &&
+      (filterTrip === "all" || b.tripType === filterTrip)
+    );
+  });
+
+  const deleteBooking = async (bookingId) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this booking?"
+    );
+    if (!confirmed) return;
+
+    // setDeleting(true);
+    // setError(null);
+    // setSuccessMessage(null);
+
+    try {
+      await axios.delete(`http://localhost:8080/delete/${bookingId}`);
+      setBookings((prevBookings) =>
+        prevBookings.filter((booking) => booking.bookingId !== bookingId)
+      );
+      // setFilteredBookings((prevFiltered) =>
+      //   prevFiltered.filter((booking) => booking.bookingId !== bookingId)
+      // );
+      // setSuccessMessage(
+      //   `Booking with ID ${bookingId} has been deleted successfully.`
+      // );
+
+      fetchBookings();
+    } catch (error) {
+      setError("Error deleting booking");
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   return (
     <div className="flex">
@@ -96,7 +132,7 @@ const Bookings = () => {
         {/* Header Section */}
         <div className="bg-gray-100 p-4 flex items-center justify-between rounded-lg shadow">
           <h2 className="font-semibold text-lg flex items-center">
-            <span className="mr-2">🚖</span> Add Custom Booking
+            <span className="mr-2">🚖</span> Custom Bookings
           </h2>
           <button
             onClick={() => setIsFormOpen(true)}
@@ -106,11 +142,25 @@ const Bookings = () => {
           </button>
         </div>
 
+        {/* Filter Options */}
+        <div className="mt-4 flex items-center space-x-4">
+          <label className="text-gray-700">Filter by Trip Type:</label>
+          <select
+            value={filterTrip}
+            onChange={(e) => setFilterTrip(e.target.value)}
+            className="border p-2 rounded"
+          >
+            <option value="all">All Bookings</option>
+            <option value="oneWay">One Way</option>
+            <option value="Round Trip">Round Trip</option>
+          </select>
+        </div>
+
         {/* Booking Form */}
         {isFormOpen && (
           <div className="bg-white p-6 shadow-lg rounded-lg mt-4">
             <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold">Add New Booking</h2>
+              <h2 className="text-xl font-semibold">Add New Custom Booking</h2>
               <button
                 onClick={() => setIsFormOpen(false)}
                 className="text-gray-500 hover:text-red-600"
@@ -118,9 +168,8 @@ const Bookings = () => {
                 <FaTimes size={20} />
               </button>
             </div>
-
             <form onSubmit={handleSubmit} className="mt-4">
-              {/* Trip Type Section */}
+              {/* Trip Type */}
               <div className="mb-4">
                 <label className="block text-gray-600 font-semibold mb-2">
                   Trip Type:
@@ -146,7 +195,6 @@ const Bookings = () => {
               <div className="grid grid-cols-2 gap-4">
                 <input
                   type="text"
-                  id="pickupLocation"
                   placeholder="Pickup Location"
                   className="border p-2 rounded w-full"
                   value={userPickup}
@@ -154,13 +202,11 @@ const Bookings = () => {
                 />
                 <input
                   type="text"
-                  id="dropLocation"
                   placeholder="Drop Location"
                   className="border p-2 rounded w-full"
                   value={userDrop}
                   onChange={(e) => setUserDrop(e.target.value)}
                 />
-
                 <div>
                   <label className="block text-gray-600">Start Date:</label>
                   <input
@@ -170,7 +216,6 @@ const Bookings = () => {
                     onChange={(e) => setStartDate(e.target.value)}
                   />
                 </div>
-
                 <div>
                   <label className="block text-gray-600">Time:</label>
                   <input
@@ -180,8 +225,6 @@ const Bookings = () => {
                     onChange={(e) => setTime(e.target.value)}
                   />
                 </div>
-
-                {/* Return Date for Round Trip */}
                 {tripType === "Round Trip" && (
                   <div>
                     <label className="block text-gray-600">Return Date:</label>
@@ -193,8 +236,6 @@ const Bookings = () => {
                     />
                   </div>
                 )}
-
-                {/* Car Type Dropdown */}
                 <div>
                   <label className="block text-gray-600">Car Type:</label>
                   <select
@@ -208,8 +249,6 @@ const Bookings = () => {
                   </select>
                 </div>
               </div>
-
-              {/* Amount Field */}
               <div>
                 <label className="block text-gray-600">Amount:</label>
                 <input
@@ -219,7 +258,6 @@ const Bookings = () => {
                   onChange={(e) => setAmount(e.target.value)}
                 />
               </div>
-
               <button
                 type="submit"
                 className="mt-4 bg-blue-600 text-white px-4 py-2 rounded"
@@ -230,13 +268,13 @@ const Bookings = () => {
           </div>
         )}
 
-        {/* Booking Table */}
+        {/* Bookings Table */}
         <div className="bg-white shadow-lg rounded-lg p-4 mt-6">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">
-            Bookings Overview
+            Custom Bookings Overview
           </h2>
-          <div className="overflow-hidden">
-            <table className="table-auto w-full border border-gray-200 rounded-lg shadow-sm">
+          <div className="overflow-x-auto">
+            <table className="min-w-full table-auto border border-gray-200 rounded-lg shadow-sm">
               <thead className="bg-gray-100">
                 <tr>
                   <th className="px-2 py-1 text-left text-xs font-semibold text-gray-700">
@@ -248,7 +286,6 @@ const Bookings = () => {
                   <th className="px-2 py-1 text-left text-xs font-semibold text-gray-700">
                     Drop Location
                   </th>
-
                   <th className="px-2 py-1 text-left text-xs font-semibold text-gray-700">
                     Date/Time
                   </th>
@@ -267,9 +304,11 @@ const Bookings = () => {
                   <th className="px-2 py-1 text-left text-xs font-semibold text-gray-700">
                     Amount
                   </th>
-
                   <th className="px-2 py-1 text-left text-xs font-semibold text-gray-700">
-                    View
+                    Status
+                  </th>
+                  <th className="px-2 py-1 text-left text-xs font-semibold text-gray-700">
+                    Delete
                   </th>
                   <th className="px-2 py-1 text-left text-xs font-semibold text-gray-700">
                     Action
@@ -277,9 +316,9 @@ const Bookings = () => {
                 </tr>
               </thead>
               <tbody>
-                {booking.map((row, index) => (
+                {filteredBookings.map((row, index) => (
                   <tr
-                    key={row.bookid}
+                    key={row.id || index}
                     className={`${
                       index % 2 === 0 ? "bg-gray-50" : "bg-white"
                     } hover:bg-gray-100`}
@@ -294,7 +333,7 @@ const Bookings = () => {
                       {row.userDrop}
                     </td>
                     <td className="px-2 py-2 text-gray-700 text-xs">
-                      {row.date}/{row.time}
+                      {row.startDate} {row.time}
                     </td>
                     <td className="px-2 py-2 text-gray-700 text-xs">
                       {row.tripType}
@@ -306,18 +345,65 @@ const Bookings = () => {
                       {row.startDate}
                     </td>
                     <td className="px-2 py-2 text-gray-700 text-xs">
-                      {row.returnDate}
+                      {row.returnDate || "N/A"}
                     </td>
                     <td className="px-2 py-2 text-gray-700 text-xs">
                       {row.amount}
                     </td>
-                    <td className="px-2 py-2 text-gray-700 text-xs">
-                      {row.amount}
+                    <td className=" p-2">
+                      <span
+                        className={`px-2 py-1 rounded ${
+                          row.status === 0
+                            ? "bg-yellow-500" // Pending
+                            : row.status === 1
+                            ? "bg-blue-500" // Ongoing
+                            : row.status === 2
+                            ? "bg-green-500" // Completed
+                            : row.status === 3
+                            ? "bg-red-500" // Cancelled
+                            : "bg-gray-500" // Default color for invalid or undefined status
+                        } text-white`}
+                      >
+                        {row.status === 0
+                          ? "Pending"
+                          : row.status === 1
+                          ? "Ongoing"
+                          : row.status === 2
+                          ? "Completed"
+                          : row.status === 3
+                          ? "Cancelled"
+                          : "Unknown"}
+                      </span>
+                    </td>
+
+                    <td className="p-2 text-center">
+                      <button
+                        className="bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600"
+                        onClick={() => deleteBooking(row.id)}
+                        disabled={deleting}
+                      >
+                        {deleting ? "Deleting..." : "Delete"}
+                      </button>
+                    </td>
+                    <td className=" p-2 text-center">
+                      <button
+                        className="bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-600"
+                        onClick={() =>
+                          router.push(`/online/online-booking/vendor/${row.id}`)
+                        }
+                      >
+                        Action
+                      </button>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+            {filteredBookings.length === 0 && (
+              <p className="text-center text-gray-500 mt-4">
+                No custom bookings found.
+              </p>
+            )}
           </div>
         </div>
       </div>

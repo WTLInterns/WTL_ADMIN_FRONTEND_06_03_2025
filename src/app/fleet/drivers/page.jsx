@@ -1,8 +1,9 @@
 "use client";
-import { FaPlus } from "react-icons/fa";
+import { FaArrowRight, FaPlus } from "react-icons/fa";
 import React, { useEffect, useState } from "react";
 import Navbar from "../../../container/components/Navbar";
 import AddDriverModal from "../../../container/components/AddDriverModal";
+import { useRouter } from "next/navigation";
 
 // Dummy Data
 const dData = [
@@ -66,11 +67,16 @@ const page = () => {
     }
   };
 
+  const router = useRouter();
+  const handleStatusClick = (status) => {
+    router.push(`/status/drivers/${status}`);
+  };
+
   const [driver, setDriver] = useState([]);
 
   useEffect(() => {
     // Fetching data from the backend
-    fetch("https://worldtriplink.com/driverAdmin/all") // Make sure this URL matches your backend API
+    fetch("http://localhost:8080/driverAdmin/all") // Make sure this URL matches your backend API
       .then((response) => response.json())
       .then((data) => setDriver(data))
       .catch((error) => console.error("Error fetching vehicles:", error));
@@ -98,8 +104,7 @@ const page = () => {
             {/* Header Section */}
             <div className="bg-gray-100 p-4 flex items-center justify-between rounded-lg shadow">
               <h2 className="font-semibold text-lg flex items-center">
-                <span className="mr-2">🚖</span> All Outsource Cars | Cabs
-                Details
+                <span className="mr-2">🚖</span> All Drivers Details
               </h2>
               <button
                 className="border p-2 rounded-md bg-gray-200 hover:bg-gray-300"
@@ -116,13 +121,23 @@ const page = () => {
             {/* Status Section */}
             <div className="bg-white p-4 mt-4 rounded-lg shadow">
               <div className="flex space-x-4">
-                <button className="bg-yellow-500 text-white px-3 py-1 rounded flex items-center">
+                <button
+                  className="bg-yellow-500 text-white px-3 py-1 rounded flex items-center"
+                  onClick={() => {
+                    handleStatusClick("PENDING");
+                  }}
+                >
                   Pending{" "}
                   <span className="ml-2 bg-white text-black px-2 py-0.5 rounded">
                     {p}
                   </span>
                 </button>
-                <button className="bg-green-600 text-white px-3 py-1 rounded flex items-center">
+                <button
+                  className="bg-green-600 text-white px-3 py-1 rounded flex items-center"
+                  onClick={() => {
+                    handleStatusClick("COMPLETED");
+                  }}
+                >
                   Approved{" "}
                   <span className="ml-2 bg-white text-black px-2 py-0.5 rounded">
                     {c}
@@ -165,6 +180,7 @@ const page = () => {
                     <th className="border px-4 py-2">Email_id</th>
                     <th className="border px-4 py-2">Address</th>
                     <th className="border px-4 py-2">Status</th>
+                    <th className="border px-4 py-2">Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -185,6 +201,16 @@ const page = () => {
                       </td>
                       <td className="border px-4 py-2 text-center">
                         {data.status}
+                      </td>
+                      <td className="border px-4 py-2 flex justify-center">
+                        <button
+                          className="border rounded-full p-2 flex items-center justify-center"
+                          onClick={() =>
+                            router.push(`/fleet/drivers/${data.id}`)
+                          } // Handle button click
+                        >
+                          <FaArrowRight />
+                        </button>
                       </td>
                     </tr>
                   ))}

@@ -7,53 +7,74 @@ export default function B2BDetailsPage() {
   const params = useParams();
   const router = useRouter();
 
-  const [b2bList, setB2bList] = useState([]);
   const [selectedB2B, setSelectedB2B] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // For displaying a single image in a modal
+  // Modal for viewing an image
   const [showImageModal, setShowImageModal] = useState(false);
   const [imageSrc, setImageSrc] = useState(null);
 
-  // 1) Load the B2B list from localStorage
-  useEffect(() => {
-    const data = localStorage.getItem("b2bList");
-    if (data) {
-      setB2bList(JSON.parse(data));
+  // Helper: Build full image URL if not already absolute.
+  // If the path starts with "/uploads/", it prepends "http://localhost:8080"
+  const buildImageUrl = (path) => {
+    if (!path) return null;
+    if (path.startsWith("http")) return path;
+    if (path.startsWith("/uploads/")) {
+      return "http://localhost:8080" + path;
     }
-  }, []);
+    return "http://localhost:8080/uploads/" + path;
+  };
 
-  // 2) Once we have b2bList, find the matching B2B by ID
+  // Fetch the B2B record by ID from the backend
   useEffect(() => {
-    if (b2bList.length > 0) {
-      const found = b2bList.find(
-        (b2b) => b2b.id === parseInt(params.id, 10)
-      );
-      setSelectedB2B(found || null);
+    async function fetchB2B() {
+      try {
+        const response = await fetch(`http://localhost:8080/b2b/${params.id}`);
+        if (!response.ok) {
+          throw new Error("B2B not found");
+        }
+        const data = await response.json();
+        console.log("Fetched B2B details:", data);
+        setSelectedB2B(data);
+      } catch (error) {
+        console.error("Error fetching B2B details:", error);
+      } finally {
+        setLoading(false);
+      }
     }
-  }, [b2bList, params.id]);
+    fetchB2B();
+  }, [params.id]);
 
-  // If no B2B found or still loading
+  if (loading) {
+    return (
+      <Navbar>
+        <div className="p-6">
+          <h2 className="text-2xl font-bold mb-4">B2B Details</h2>
+          <p>Loading...</p>
+        </div>
+      </Navbar>
+    );
+  }
   if (!selectedB2B) {
     return (
       <Navbar>
         <div className="p-6">
           <h2 className="text-2xl font-bold mb-4">B2B Details</h2>
-          <p>Loading or not found...</p>
+          <p>Record not found.</p>
         </div>
       </Navbar>
     );
   }
 
-  // Open the modal with the selected image
-  const handleViewDoc = (base64Image) => {
-    setImageSrc(base64Image);
+  // When "View Doc" is clicked, open the modal with the proper image URL.
+  const handleViewDoc = (imagePath) => {
+    const fullUrl = buildImageUrl(imagePath);
+    console.log("Opening image modal with URL:", fullUrl);
+    setImageSrc(fullUrl);
     setShowImageModal(true);
   };
 
-  // Close the details page and go back
-  const handleClosePage = () => {
-    router.back();
-  };
+  const handleClose = () => router.back();
 
   return (
     <Navbar>
@@ -61,17 +82,13 @@ export default function B2BDetailsPage() {
         {/* Header with Close button */}
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-gray-800">B2B Details</h2>
-          <button
-            onClick={handleClosePage}
-            className="bg-red-600 text-white px-4 py-2 rounded"
-          >
+          <button onClick={handleClose} className="bg-red-600 text-white px-4 py-2 rounded">
             Close
           </button>
         </div>
 
-        {/* Main layout: Two columns */}
         <div className="flex flex-col md:flex-row gap-4">
-          {/* Left Column: Profile Details */}
+          {/* Left Panel: Profile Details */}
           <div className="w-full md:w-2/3 bg-gray-50 p-4 rounded-lg shadow">
             <h3 className="text-xl font-bold mb-4">Profile Details</h3>
 
@@ -79,27 +96,27 @@ export default function B2BDetailsPage() {
             <h4 className="font-semibold mb-2">Company Information</h4>
             <div className="grid grid-cols-2 gap-2 mb-4">
               <div>
-                <p className="font-medium">Name</p>
-                <p>{selectedB2B.businessName}</p>
+                <p className="font-medium">Company Name</p>
+                <p>{selectedB2B.companyName || "N/A"}</p>
               </div>
               <div>
                 <p className="font-medium">Mobile</p>
-                <p>{selectedB2B.contact}</p>
+                <p>{selectedB2B.contactNo || "N/A"}</p>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-2 mb-4">
               <div>
-                <p className="font-medium">Email</p>
+                <p className="font-medium">Business Email</p>
                 <p>{selectedB2B.businessEmail || "N/A"}</p>
               </div>
               <div>
                 <p className="font-medium">Alternate Mobile</p>
-                <p>{selectedB2B.alternateContact || "N/A"}</p>
+                <p>{selectedB2B.alternateMobileNo || "N/A"}</p>
               </div>
             </div>
             <div className="mb-4">
-              <p className="font-medium">Address</p>
-              <p>{selectedB2B.city}</p>
+              <p className="font-medium">City</p>
+              <p>{selectedB2B.city || "N/A"}</p>
             </div>
 
             {/* Bank Details */}
@@ -114,32 +131,45 @@ export default function B2BDetailsPage() {
                 <p>{selectedB2B.ifscCode || "N/A"}</p>
               </div>
             </div>
-          </div>
 
-          {/* Right Column: Certificate */}
-          <div className="w-full md:w-1/3 bg-gray-50 p-4 rounded-lg shadow">
-            <h3 className="text-xl font-bold mb-4">Certificate</h3>
-
-            {/* Company Logo: display image directly */}
-            <div className="mb-4">
-              <p className="font-medium">Company Logo</p>
+            {/* Company Logo */}
+            <div className="mt-6">
+              <p className="font-medium mb-2">Company Logo</p>
               {selectedB2B.companyLogo ? (
                 <img
-                  src={selectedB2B.companyLogo}
+                  src={buildImageUrl(selectedB2B.companyLogo)}
                   alt="Company Logo"
-                  className="w-32 h-32 object-cover border rounded mt-2"
+                  className="w-24 h-24 object-cover border rounded"
                 />
               ) : (
                 <p className="text-gray-500">No logo uploaded</p>
               )}
             </div>
+          </div>
 
-            {/* Company Doc as button */}
+          {/* Right Panel: Certificates & Docs */}
+          <div className="w-full md:w-1/3 bg-gray-50 p-4 rounded-lg shadow">
+            <h3 className="text-xl font-bold mb-4">Certificates & Docs</h3>
+
             <div className="mb-4">
-              <p className="font-medium">Company Doc</p>
-              {selectedB2B.govtApprovalCert ? (
+              <p className="font-medium">Govt Approval Certificate</p>
+              {selectedB2B.govtApprovalCertificate ? (
                 <button
-                  onClick={() => handleViewDoc(selectedB2B.govtApprovalCert)}
+                  onClick={() => handleViewDoc(selectedB2B.govtApprovalCertificate)}
+                  className="bg-blue-600 text-white px-3 py-1 rounded mt-2"
+                >
+                  View Doc
+                </button>
+              ) : (
+                <p className="text-gray-500">No certificate uploaded</p>
+              )}
+            </div>
+
+            <div className="mb-4">
+              <p className="font-medium">Company Docs</p>
+              {selectedB2B.companyDocs ? (
+                <button
+                  onClick={() => handleViewDoc(selectedB2B.companyDocs)}
                   className="bg-blue-600 text-white px-3 py-1 rounded mt-2"
                 >
                   View Doc
@@ -149,25 +179,28 @@ export default function B2BDetailsPage() {
               )}
             </div>
 
-            {/* PAN Photo as button */}
-            <div>
-              <p className="font-medium">PAN Photo</p>
-              {selectedB2B.panPhoto ? (
+            <div className="mb-4">
+              <p className="font-medium">PAN Docs</p>
+              {selectedB2B.panDocs ? (
                 <button
-                  onClick={() => handleViewDoc(selectedB2B.panPhoto)}
+                  onClick={() => handleViewDoc(selectedB2B.panDocs)}
                   className="bg-blue-600 text-white px-3 py-1 rounded mt-2"
                 >
                   View Doc
                 </button>
               ) : (
-                <p className="text-gray-500">No PAN photo uploaded</p>
+                <p className="text-gray-500">No PAN docs uploaded</p>
               )}
+            </div>
+
+            <div className="mt-4">
+              <p className="font-medium">PAN Number</p>
+              <p>{selectedB2B.panNo || "N/A"}</p>
             </div>
           </div>
         </div>
 
-        {/* Footer Note and Buttons */}
-        <p className="mt-6 text-green-600">
+        {/* <p className="mt-6 text-green-600">
           This B2B is available to assign driver and cab
         </p>
         <div className="mt-4 flex gap-2">
@@ -177,10 +210,10 @@ export default function B2BDetailsPage() {
           <button className="bg-red-600 text-white px-4 py-2 rounded">
             Block
           </button>
-        </div>
+        </div> */}
       </div>
 
-      {/* Image Modal for viewing docs */}
+      {/* Image Modal */}
       {showImageModal && imageSrc && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-1/2 max-h-[90vh] overflow-auto relative">

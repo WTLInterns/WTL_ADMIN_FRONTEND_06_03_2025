@@ -65,6 +65,10 @@ const Page = () => {
     carOtherDetails: "",
   });
 
+  const handleStatusClick = (status) => {
+    router.push(`/status/cabs/${status}`);
+  };
+
   const [files, setFiles] = useState({
     vehicleRcImg: null,
     insurance: null,
@@ -111,7 +115,7 @@ const Page = () => {
 
     try {
       const response = await axios.post(
-        "https://worldtriplink.com/cabAdmin/save",
+        "http://localhost:8080/cabAdmin/save",
         data,
         {
           headers: {
@@ -134,7 +138,7 @@ const Page = () => {
 
   useEffect(() => {
     // Fetching data from the backend
-    fetch("https://worldtriplink.com/cabAdmin/all") // Make sure this URL matches your backend API
+    fetch("http://localhost:8080/cabAdmin/all") // Make sure this URL matches your backend API
       .then((response) => response.json())
       .then((data) => {
         setCab(data);
@@ -442,13 +446,23 @@ const Page = () => {
             {/* Status Section with Pending & Approved Buttons */}
             <div className="bg-white p-4 mt-6 rounded-lg shadow-lg">
               <div className="flex space-x-4">
-                <button className="bg-yellow-500 text-white px-4 py-2 rounded flex items-center shadow-sm">
+                <button
+                  className="bg-yellow-500 text-white px-4 py-2 rounded flex items-center shadow-sm"
+                  onClick={() => {
+                    handleStatusClick("PENDING");
+                  }}
+                >
                   Pending{" "}
                   <span className="ml-2 bg-white text-black px-2 py-0.5 rounded">
                     {p}
                   </span>
                 </button>
-                <button className="bg-green-600 text-white px-4 py-2 rounded flex items-center shadow-sm">
+                <button
+                  className="bg-green-600 text-white px-4 py-2 rounded flex items-center shadow-sm"
+                  onClick={() => {
+                    handleStatusClick("COMPLETED");
+                  }}
+                >
                   Approved{" "}
                   <span className="ml-2 bg-white text-black px-2 py-0.5 rounded">
                     {c}

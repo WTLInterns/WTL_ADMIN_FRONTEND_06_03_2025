@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect, useState } from "react";
-
 import { FaCar } from "react-icons/fa";
 import Navbar from "../../../../container/components/Navbar";
 import { useParams } from "next/navigation";
@@ -9,31 +8,27 @@ import axios from "axios";
 const ArrowPage = () => {
   const [showModal, setShowModal] = useState(false); // State for modal visibility
   const [modalTitle, setModalTitle] = useState(""); // Store the button text dynamically
-  const [rcNumber, setRcNumber] = useState(""); // Example RC Number
   const [cab, setCab] = useState([]);
-
   const params = useParams();
-  console.log(params.id);
-
-  // const cabs = cab?.find((p) => p.cab === parseInt(params.id));
 
   // Function to open modal with a dynamic title
   const openModal = (title) => {
     setModalTitle(title);
     setShowModal(true);
   };
-  // console.log(id);
+
+  // Fetching data from the backend
   useEffect(() => {
-    // Fetching data from the backend
-    fetch(`http://localhost:8080/vehicle/${params.id}`) // Make sure this URL matches your backend API
+    fetch(`http://localhost:8080/driverAdmin/${params.id}`) // Make sure this URL matches your backend API
       .then((response) => response.json())
       .then((data) => setCab(data))
       .catch((error) => console.error("Error fetching vehicles:", error));
-  }, []);
+  }, [params.id]);
 
-  const [status, setStatus] = useState("");
+  const [status, setStatus] = useState();
   const [message, setMessage] = useState(""); // For displaying messages like success or error
 
+  // Function to handle status update
   const updateStatus = (status) => {
     // Validate the status (ensure it's either 'COMPLETED' or 'PENDING')
     if (status !== "COMPLETED" && status !== "PENDING") {
@@ -44,7 +39,7 @@ const ArrowPage = () => {
     // Send the PUT request to update the status
     axios
       .put(
-        `http://localhost:8080/vehicle/${params.id}/status`,
+        `http://localhost:8080/driverAdmin/${params.id}/status`,
         { status },
         {
           headers: {
@@ -65,7 +60,7 @@ const ArrowPage = () => {
         }
       });
   };
-  console.log(cab);
+
   return (
     <Navbar>
       <div className="container mx-auto p-4">
@@ -73,7 +68,7 @@ const ArrowPage = () => {
         <div className="flex items-center space-x-2 bg-gray-100 p-4 rounded-lg shadow-md">
           <FaCar className="text-blue-500 text-xl" />
           <h2 className="text-lg font-semibold text-gray-700">
-            Vehicle Details
+            Driver Details
           </h2>
         </div>
 
@@ -81,53 +76,51 @@ const ArrowPage = () => {
         <div className="relative flex items-center bg-white p-6 rounded-lg shadow-lg mt-10">
           {/* Left - Vehicle Image and Text */}
           <div className="w-1/2 h-[500px] flex flex-col justify-center items-center">
-            {cab.cabImage && (
+            {cab.DriverImgSelfies && (
               <img
-                src={`http://localhost:8080/images/outSourceImg/${cab.carImage}`} // Prepend the static URL
+                src={`http://localhost:8080/images/driverAdminImg/${cab.DriverImgSelfie}`}
                 alt="Car"
                 className="w-full h-full object-cover"
               />
             )}
             {/* Text Below the Image with slight margin */}
-            <div className="flex justify-start mt-8 space-x-6">
-              {" "}
-              {/* Increased margin-top */}
-              <span className="text-gray-700 font-medium">Front side</span>
-              <span className="text-gray-700 font-medium">Back side</span>
-              <span className="text-gray-700 font-medium">Side side</span>
-            </div>
-            {/* Small Images Below Each Text */}
             <div className="flex justify-start mt-4 space-x-6">
               {/* Image 1 below Text 1 */}
               <div className="flex flex-col items-center">
-                {cab.frontImage && (
+                {cab.Aadhar ? (
                   <img
-                    src={`http://localhost:8080/images/outSourceImg/${cab.frontImage}`} // Prepend the static URL
+                    src={`http://localhost:8080/images/driverAdminImg/${cab.Aadhar}`} // Prepend the static URL
                     alt="Car"
                     className="w-16 h-16 object-cover"
                   />
+                ) : (
+                  <span>No Image</span>
                 )}
               </div>
 
               {/* Image 2 below Text 2 */}
               <div className="flex flex-col items-center">
-                {cab.sideImage && (
+                {cab.DrLicenceNum ? (
                   <img
-                    src={`http://localhost:8080/images/outSourceImg/${cab.backImage}`} // Prepend the static URL
+                    src={`http://localhost:8080/images/driverAdminImg/${cab.DrLicenceNum}`} // Prepend the static URL
                     alt="Car"
                     className="w-16 h-16 object-cover"
                   />
+                ) : (
+                  <span>No Image</span>
                 )}
               </div>
 
               {/* Image 3 below Text 3 */}
               <div className="flex flex-col items-center">
-                {cab.cabImage && (
+                {cab.PvcNo ? (
                   <img
-                    src={`http://localhost:8080/images/outSourceImg/${cab.sideImage}`} // Prepend the static URL
+                    src={`http://localhost:8080/images/driverAdminImg/${cab.PvcNo}`} // Prepend the static URL
                     alt="Car"
                     className="w-16 h-16 object-cover"
                   />
+                ) : (
+                  <span>No Image</span>
                 )}
               </div>
             </div>
@@ -138,11 +131,11 @@ const ArrowPage = () => {
             {/* RC Number */}
             <div className="flex items-center space-x-4">
               <span className="text-lg font-semibold text-gray-700 w-full">
-                Car RC Number
+                Driver Selfie
               </span>
               <button
                 className="bg-black text-white py-2 px-4 rounded-lg hover:bg-gray-800"
-                onClick={() => openModal("Car RC Number")}
+                onClick={() => openModal("Driver Selfie")}
               >
                 Show Image
               </button>
@@ -152,11 +145,11 @@ const ArrowPage = () => {
             {/* Insurance */}
             <div className="flex items-center space-x-4">
               <span className="text-lg font-semibold text-gray-700 w-full">
-                Insurance
+                Aaddhar
               </span>
               <button
                 className="bg-black text-white py-2 px-4 rounded-lg hover:bg-gray-800"
-                onClick={() => openModal("Insurance")}
+                onClick={() => openModal("Aaddhar")}
               >
                 Show Image
               </button>
@@ -166,11 +159,11 @@ const ArrowPage = () => {
             {/* Permit */}
             <div className="flex items-center space-x-4">
               <span className="text-lg font-semibold text-gray-700 w-full">
-                Permit
+                Driver License No
               </span>
               <button
                 className="bg-black text-white py-2 px-4 rounded-lg hover:bg-gray-800"
-                onClick={() => openModal("Permit")}
+                onClick={() => openModal("Driver License No")}
               >
                 Show Image
               </button>
@@ -180,11 +173,11 @@ const ArrowPage = () => {
             {/* Fitness Certificate */}
             <div className="flex items-center space-x-4">
               <span className="text-lg font-semibold text-gray-700 w-full">
-                Fitness Certificate
+                PVC No
               </span>
               <button
                 className="bg-black text-white py-2 px-4 rounded-lg hover:bg-gray-800"
-                onClick={() => openModal("Fitness Certificate")}
+                onClick={() => openModal("PVC No")}
               >
                 Show Image
               </button>
@@ -215,49 +208,36 @@ const ArrowPage = () => {
               <h2 className="text-xl font-semibold mb-4 text-black">
                 {modalTitle}
               </h2>
-              {/* <input
-                type="text"
-                value={rcNumber}
-                readOnly
-                className="w-full p-2 border border-gray-300 rounded-lg mb-4"
-              /> */}
 
-              {modalTitle == "Car RC Number" ? (
+              {/* Dynamic Image Rendering Based on Modal Title */}
+              {modalTitle === "Driver Selfie" && cab.DriverImgSelfie ? (
                 <img
-                  src={`http://localhost:8080/images/outSourceImg/${cab.cabImage}`} // Prepend the static URL
+                  src={`http://localhost:8080/images/driverAdminImg/${cab.DriverImgSelfie}`}
+                  alt={modalTitle}
+                  className="w-full h-full object-cover mb-5"
+                />
+              ) : modalTitle === "Aaddhar" && cab.Aadhar ? (
+                <img
+                  src={`http://localhost:8080/images/driverAdminImg/${cab.Aadhar}`}
+                  alt={modalTitle}
+                  className="w-full h-full object-cover mb-5"
+                />
+              ) : modalTitle === "Driver License No" && cab.DrLicenceNum ? (
+                <img
+                  src={`http://localhost:8080/images/driverAdminImg/${cab.DrLicenceNum}`}
+                  alt={modalTitle}
+                  className="w-full h-full object-cover mb-5"
+                />
+              ) : modalTitle === "PVC No" && cab.PvcNo ? (
+                <img
+                  src={`http://localhost:8080/images/driverAdminImg/${cab.PvcNo}`}
                   alt={modalTitle}
                   className="w-full h-full object-cover mb-5"
                 />
               ) : (
-                " "
-              )}
-
-              {modalTitle == "Insurance" ? (
-                <img
-                  src={`http://localhost:8080/images/outSourceImg/${cab.insurance}`} // Prepend the static URL
-                  alt={modalTitle}
-                  className="w-full h-full object-cover mb-5"
-                />
-              ) : (
-                " "
-              )}
-              {modalTitle == "Permit" ? (
-                <img
-                  src={`http://localhost:8080/images/outSourceImg/${cab.permit}`} // Prepend the static URL
-                  alt={modalTitle}
-                  className="w-full h-full object-cover mb-5"
-                />
-              ) : (
-                " "
-              )}
-              {modalTitle == "Fitness Certificate" ? (
-                <img
-                  src={`http://localhost:8080/images/outSourceImg/${cab.fitnessCert}`} // Prepend the static URL
-                  alt={modalTitle}
-                  className="w-full h-full object-cover mb-5"
-                />
-              ) : (
-                " "
+                <div className="w-full h-full flex justify-center items-center">
+                  <span>No Image Available</span>
+                </div>
               )}
 
               <button

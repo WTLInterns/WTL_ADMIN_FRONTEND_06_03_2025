@@ -1,153 +1,278 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { FaEye, FaPlus } from "react-icons/fa";
 import Navbar from "../../../container/components/Navbar";
 
-const AllVendors = () => {
+const VendorDetails = ({ params }) => {
+  const { id } = params;
+  const [vendor, setVendor] = useState(null);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const [search, setSearch] = useState("");
-  const [showForm, setShowForm] = useState(false);
-  const [vendors, setVendors] = useState([
-    { id: 1, businessName: "ABC Traders", contact: "9876543210", city: "New York" },
-    { id: 2, businessName: "XYZ Enterprises", contact: "8765432109", city: "Los Angeles" },
-    { id: 3, businessName: "LMN Solutions", contact: "7654321098", city: "Chicago" },
-  ]);
-  const [newVendor, setNewVendor] = useState({
-    companyName: "",
-    contactNo: "",
-    alternateMobileNo: "",
-    city: "",
-    companyLogo: null,
-    govtApprovalCertificate: null,
-    companyDocs: null,
-    businessEmail: "",
-    bankName: "",
-    bankAccountNo: "",
-    ifscCode: "",
-    panNo: "",
-    panPhoto: null,
-    companyOtherDetails: "",
-  });
 
-  const handleFileChange = (e) => {
-    setNewVendor({ ...newVendor, [e.target.name]: e.target.files[0] });
-  };
+  useEffect(() => {
+    const fetchVendorDetails = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(`http://localhost:8080/vendors/${id}`);
+        const data = await response.json();
+        setVendor(data);
+      } catch (error) {
+        console.error("Error fetching vendor details:", error);
+      }
+      setLoading(false);
+    };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const newEntry = { ...newVendor, id: vendors.length + 1 };
-    setVendors([...vendors, newEntry]);
-    setShowForm(false);
-  };
+    fetchVendorDetails();
+  }, [id]);
 
   return (
     <Navbar>
-      <div className="p-6 bg-white shadow-lg rounded-lg">
-        <h2 className="text-2xl font-bold mb-6 text-gray-800">B2B List</h2>
+      <div className="flex justify-center items-center min-h-screen bg-gray-50 p-8">
+        <div className="bg-white shadow-xl rounded-xl p-8 w-full max-w-4xl flex">
+          {/* Left Box: Vendor Details */}
+          <div className="w-1/2 p-6">
+            <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
+              Vendor Details
+            </h2>
 
-        <div className="mb-4 flex items-center gap-4">
-          <input
-            type="text"
-            className="w-64 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-            placeholder="Search..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-          <button
-            onClick={() => setShowForm(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
-          >
-            <FaPlus /> Add B2B
-          </button>
-        </div>
+            {loading ? (
+              <p className="text-gray-500 text-center">Loading...</p>
+            ) : vendor ? (
+              <div className="border border-gray-200 p-6 rounded-lg space-y-4">
+                <h3 className="text-xl font-semibold text-gray-900">
+                  {vendor.vendorCompanyName}
+                </h3>
+                <p className="text-gray-500">{vendor.city}</p>
 
-        {showForm && (
-          <form className="bg-gray-100 p-6 rounded-lg shadow-md" onSubmit={handleSubmit}>
-            <h3 className="text-xl font-semibold mb-4">Add B2B</h3>
-            <div className="grid grid-cols-2 gap-4">
-              {Object.keys(newVendor).map((key) => (
-                <div key={key} className="flex flex-col">
-                  <label htmlFor={key} className="mb-1 font-semibold">
-                    {key.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase())}
-                  </label>
-                  {key.includes("Logo") || key.includes("Certificate") || key.includes("Docs") || key.includes("Photo") ? (
-                    <input
-                      id={key}
-                      name={key}
-                      type="file"
-                      className="p-2 border border-gray-300 rounded-lg"
-                      onChange={handleFileChange}
-                    />
-                  ) : (
-                    <input
-                      id={key}
-                      type="text"
-                      className="p-2 border border-gray-300 rounded-lg"
-                      value={newVendor[key]}
-                      onChange={(e) => setNewVendor({ ...newVendor, [key]: e.target.value })}
-                    />
-                  )}
+                <div className="space-y-3 text-gray-700">
+                  <p>
+                    <strong className="text-gray-900">Contact:</strong>{" "}
+                    {vendor.contactNo}
+                  </p>
+                  <p>
+                    <strong className="text-gray-900">
+                      Alternate Contact:
+                    </strong>{" "}
+                    {vendor.alternateMobileNo}
+                  </p>
+                  <p>
+                    <strong className="text-gray-900">Udyog Aadhar:</strong>{" "}
+                    {vendor.udyogAadharNo}
+                  </p>
+                  <p>
+                    <strong className="text-gray-900">Email:</strong>{" "}
+                    {vendor.vendorEmail}
+                  </p>
+                  <p>
+                    <strong className="text-gray-900">Bank:</strong>{" "}
+                    {vendor.bankName}
+                  </p>
+                  <p>
+                    <strong className="text-gray-900">Account No:</strong>{" "}
+                    {vendor.bankAccountNo}
+                  </p>
+                  <p>
+                    <strong className="text-gray-900">IFSC Code:</strong>{" "}
+                    {vendor.ifscCode}
+                  </p>
+                  <p>
+                    <strong className="text-gray-900">Aadhar No:</strong>{" "}
+                    {vendor.aadharNo}
+                  </p>
+                  <p>
+                    <strong className="text-gray-900">PAN No:</strong>{" "}
+                    {vendor.panNo}
+                  </p>
                 </div>
-              ))}
-            </div>
-            <div className="mt-4 flex gap-4">
-              <button type="submit" className="bg-green-600 text-white px-6 py-2 rounded-lg">Submit</button>
-              <button type="reset" className="bg-yellow-500 text-white px-6 py-2 rounded-lg" onClick={() => setNewVendor({
-                companyName: "",
-                contactNo: "",
-                alternateMobileNo: "",
-                city: "",
-                companyLogo: null,
-                govtApprovalCertificate: null,
-                companyDocs: null,
-                businessEmail: "",
-                bankName: "",
-                bankAccountNo: "",
-                ifscCode: "",
-                panNo: "",
-                panPhoto: null,
-                companyOtherDetails: "",
-              })}>Reset</button>
-              <button type="button" className="bg-red-600 text-white px-6 py-2 rounded-lg" onClick={() => setShowForm(false)}>Close</button>
-            </div>
-          </form>
-        )}
+              </div>
+            ) : (
+              <p className="text-red-500 text-center">Vendor not found!</p>
+            )}
 
-        <div className="overflow-x-auto mt-4">
-          <table className="w-full border border-gray-300 rounded-lg overflow-hidden shadow-md">
-            <thead>
-              <tr className="bg-blue-600 text-white">
-                <th className="p-3 text-left">B2B ID</th>
-                <th className="p-3 text-left">Business Name</th>
-                <th className="p-3 text-left">Contact</th>
-                <th className="p-3 text-left">City</th>
-                <th className="p-3 text-center">View</th>
-              </tr>
-            </thead>
-            <tbody>
-              {vendors.map((vendor) => (
-                <tr key={vendor.id} className="border-b bg-gray-100">
-                  <td className="p-3">{vendor.id}</td>
-                  <td className="p-3">{vendor.companyName}</td>
-                  <td className="p-3">{vendor.contactNo}</td>
-                  <td className="p-3">{vendor.city}</td>
-                  <td className="p-3 text-center">
-                    <button
-                      onClick={() => router.push(`/vendor-details/${vendor.id}`)}
-                      className="text-blue-600 hover:text-blue-800 transition duration-200"
-                    >
-                      <FaEye size={20} />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+            <button
+              className="mt-6 w-full bg-gray-800 text-white py-3 rounded-lg hover:bg-gray-900 transition-all shadow-md"
+              onClick={() => router.push("/vendors/all-vendors")}
+            >
+              Back to Vendors
+            </button>
+          </div>
+
+          {/* Right Box: Vendor Image & Documents */}
+          <div className="w-1/2 flex flex-col items-center">
+            <img
+              src={`http://localhost:8080${vendor?.vendorImage}`}
+              alt="Vendor"
+              className="w-40 h-40 object-cover rounded-lg shadow-md"
+            />
+            <div className="mt-6 space-y-4 w-full">
+              <a
+                href={`http://localhost:8080${vendor?.panPhoto}`}
+                target="_blank"
+                className="block w-full bg-green-600 text-white text-center py-2 rounded-lg shadow-md hover:bg-green-700 transition-all"
+              >
+                View PAN
+              </a>
+              <a
+                href={`http://localhost:8080${vendor?.aadharPhoto}`}
+                target="_blank"
+                className="block w-full bg-blue-600 text-white text-center py-2 rounded-lg shadow-md hover:bg-blue-700 transition-all"
+              >
+                View Aadhar
+              </a>
+              <a
+                href={`http://localhost:8080${vendor?.govtApprovalCertificate}`}
+                target="_blank"
+                className="block w-full bg-purple-600 text-white text-center py-2 rounded-lg shadow-md hover:bg-purple-700 transition-all"
+              >
+                View Govt Certificate
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </Navbar>
   );
 };
 
-export default AllVendors;
+export default VendorDetails;
+
+// 'use client';
+// import { useEffect, useState } from 'react';
+// import { useRouter } from 'next/navigation';
+// import Navbar from "../../../container/components/Navbar";
+
+// const VendorDetails = ({ params }) => {
+//   const { id } = params;
+//   const [vendor, setVendor] = useState(null);
+//   const [loading, setLoading] = useState(false);
+//   const router = useRouter();
+
+//   useEffect(() => {
+//     const fetchVendorDetails = async () => {
+//       setLoading(true);
+//       try {
+//         const response = await fetch(`http://localhost:8080/vendors/${id}`); // Replace with actual API endpoint
+//         const data = await response.json();
+//         setVendor(data);
+//       } catch (error) {
+//         console.error('Error fetching vendor details:', error);
+//       }
+//       setLoading(false);
+//     };
+
+//     fetchVendorDetails();
+//   }, [id]);
+
+//   // Static Data for Testing
+//   const staticVendors = [
+//     {
+//       id: 1, name: 'Test', contact: '9663474741', city: 'Pune',
+//       udyogAadhar: '0987654323456', email: 'asto99999999@gmail.com',
+//       bank: 'Canara Bank', adhar: '0987654323456',
+//       image: 'https://cdn.vectorstock.com/i/500p/53/42/user-member-avatar-face-profile-icon-vector-22965342.jpg',
+//       pan: '/docs/pan1.pdf',
+//       aadhar: '/docs/aadhar1.pdf',
+//       govCertificate: '/docs/gov-cert1.pdf'
+//     },
+//     {
+//       id: 2, name: 'Snehal Travels PVT Ltd', contact: '9865656325', city: 'Mulki',
+//       udyogAadhar: 'UDYAM-XX-00-0000000', email: 'snehalbagale72@gmail.com',
+//       bank: 'ICIC Bank', adhar: '856498753656',
+//       image: 'https://cdn.vectorstock.com/i/500p/53/42/user-member-avatar-face-profile-icon-vector-22965342.jpg',
+//       pan: '/docs/pan2.pdf',
+//       aadhar: '/docs/aadhar2.pdf',
+//       govCertificate: '/docs/gov-cert2.pdf'
+//     },
+//     {
+//       id: 3, name: 'AimCab', contact: '9960969737', city: 'Pune',
+//       udyogAadhar: 'UDYAM-MH-26-0478951', email: 'adabbagwan@gmail.com',
+//       bank: 'ICIC Bank', adhar: '290186131526',
+//       image: 'https://cdn.vectorstock.com/i/500p/53/42/user-member-avatar-face-profile-icon-vector-22965342.jpg',
+//       pan: '/docs/pan3.pdf',
+//       aadhar: '/docs/aadhar3.pdf',
+//       govCertificate: '/docs/gov-cert3.pdf'
+//     },
+//   ];
+
+//   useEffect(() => {
+//     if (!vendor) {
+//       const foundVendor = staticVendors.find((v) => v.id === Number(id));
+//       if (foundVendor) setVendor(foundVendor);
+//     }
+//   }, [id, vendor]);
+
+//   return (
+//     <Navbar>
+//       <div className="flex justify-center items-center min-h-screen bg-gray-50 p-8">
+//         <div className="bg-white shadow-xl rounded-xl p-8 w-full max-w-4xl flex">
+
+//           {/* Left Box: Vendor Details */}
+//           <div className="w-1/2 p-6">
+//             <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Vendor Details</h2>
+
+//             {loading ? (
+//               <p className="text-gray-500 text-center">Loading...</p>
+//             ) : vendor ? (
+//               <div className="border border-gray-200 p-6 rounded-lg space-y-4">
+//                 <h3 className="text-xl font-semibold text-gray-900">{vendor.name}</h3>
+//                 <p className="text-gray-500">{vendor.city}</p>
+
+//                 <div className="space-y-3 text-gray-700">
+//                   <p><strong className="text-gray-900">Contact:</strong> {vendor.contact}</p>
+//                   <p><strong className="text-gray-900">Udyog Aadhar:</strong> {vendor.udyogAadhar}</p>
+//                   <p><strong className="text-gray-900">Email:</strong> {vendor.email}</p>
+//                   <p><strong className="text-gray-900">Bank:</strong> {vendor.bank}</p>
+//                   <p><strong className="text-gray-900">Aadhar:</strong> {vendor.adhar}</p>
+//                 </div>
+//               </div>
+//             ) : (
+//               <p className="text-red-500 text-center">Vendor not found!</p>
+//             )}
+
+//             <button
+//               className="mt-6 w-full bg-gray-800 text-white py-3 rounded-lg hover:bg-gray-900 transition-all shadow-md"
+//               onClick={() => router.push('/vendors/all-vendors')}
+//             >
+//               Back to Vendors
+//             </button>
+//           </div>
+
+//           {/* Right Box: Vendor Image & Documents */}
+//           <div className="w-1/2 flex flex-col items-center">
+//             <img
+//               src={vendor?.image}
+//               alt="Vendor"
+//               className="w-40 h-40 object-cover rounded-lg shadow-md"
+//             />
+//             <div className="mt-6 space-y-4 w-full">
+//               <a
+//                 href={vendor?.pan}
+//                 target="_blank"
+//                 className="block w-full bg-green-600 text-white text-center py-2 rounded-lg shadow-md hover:bg-green-700 transition-all"
+//               >
+//                 View PAN
+//               </a>
+//               <a
+//                 href={vendor?.aadhar}
+//                 target="_blank"
+//                 className="block w-full bg-blue-600 text-white text-center py-2 rounded-lg shadow-md hover:bg-blue-700 transition-all"
+//               >
+//                 View Aadhar
+//               </a>
+//               <a
+//                 href={vendor?.govCertificate}
+//                 target="_blank"
+//                 className="block w-full bg-purple-600 text-white text-center py-2 rounded-lg shadow-md hover:bg-purple-700 transition-all"
+//               >
+//                 View Govt Certificate
+//               </a>
+//             </div>
+//           </div>
+
+//         </div>
+//       </div>
+//     </Navbar>
+//   );
+// };
+
+// export default VendorDetails;

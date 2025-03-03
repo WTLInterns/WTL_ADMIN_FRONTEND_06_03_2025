@@ -40,7 +40,7 @@ const UpdateTripPricing = ({ params }) => {
 
     loadGoogleMapsAPI();
 
-    fetch("https://worldtriplink.com/api/states")
+    fetch("http://localhost:8080/api/states")
       .then((res) => res.json())
       .then((data) => {
         setStates(data);
@@ -68,7 +68,7 @@ const UpdateTripPricing = ({ params }) => {
   const handleStateChange = async (stateId) => {
     setSelectedState(stateId);
     try {
-      const response = await fetch(`https://worldtriplink.com/cities/${stateId}`);
+      const response = await fetch(`http://localhost:8080/cities/${stateId}`);
       const data = await response.json();
       setCities(data);
     } catch (error) {
@@ -79,7 +79,7 @@ const UpdateTripPricing = ({ params }) => {
   const handleDStateChange = async (stateId) => {
     setSelectedDState(stateId);
     try {
-      const response = await fetch(`https://worldtriplink.com/cities/${stateId}`);
+      const response = await fetch(`http://localhost:8080/cities/${stateId}`);
       const data = await response.json();
       setDCities(data);
     } catch (error) {
@@ -156,7 +156,7 @@ const UpdateTripPricing = ({ params }) => {
       isRoundTrip: isRoundTrip.toString(), // Include round-trip option
     }).toString();
 
-    const url = `https://worldtriplink.com/update-roundway-prices?${queryString}`;
+    const url = `http://localhost:8080/update-roundway-prices?${queryString}`;
 
     try {
       const response = await fetch(url, {
