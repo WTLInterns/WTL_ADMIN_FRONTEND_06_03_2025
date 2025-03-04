@@ -5,7 +5,7 @@ const page = () => {
   const [formData, setFormData] = useState({
     fromLocation: "",
     toLocation: "",
-    tripType: "One-way",
+    tripType: "oneWay",
     startDate: "",
     returnDate: "",
     time: "",
@@ -150,7 +150,7 @@ const page = () => {
         </div>
 
         {/* Return Date (Only if Round Trip) */}
-        {formData.tripType === "Round Trip" && (
+        {formData.tripType === "roundTrip" && (
           <div className="mb-4">
             <label
               htmlFor="returnDate"

@@ -74,7 +74,7 @@ const Layout = ({ children }) => {
                 <li>
                   <Link
                     href="/online/cancel-booking"
-                    className="flex items-center py-2 px-4 hover:bg-blue-100 rounded w-4"
+                    className="flex items-center py-2 px-4 hover:bg-blue-100 rounded"
                   >
                     <FaTimes className="mr-2" />
                     Cancel Booking

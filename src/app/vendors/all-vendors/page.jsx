@@ -20,7 +20,7 @@ const AllVendors = () => {
     ifscCode: "",
     aadharNo: "",
     panNo: "",
-    password: "", // Password field added
+    password: "",
     udyogAadharNo: "",
     govtApprovalCertificate: null,
     vendorImage: null,
@@ -87,7 +87,7 @@ const AllVendors = () => {
           ifscCode: "",
           aadharNo: "",
           panNo: "",
-          password: "", // Clear the password field after submission
+          password: "", 
           udyogAadharNo: "",
           govtApprovalCertificate: null,
           vendorImage: null,

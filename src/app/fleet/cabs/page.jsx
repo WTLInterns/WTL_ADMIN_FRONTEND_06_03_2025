@@ -406,7 +406,7 @@ const Page = () => {
                   className="w-full h-32 object-cover mb-2 rounded-md"
                 />
                 <h3 className="font-semibold text-lg">Hatchback</h3>
-                <p className="text-sm text-gray-600">4+1 Seater</p>
+                <p className="text-sm text-gray-600">3 +1 Seater</p>
               </div>
 
               {/* Card 2 */}
@@ -416,8 +416,8 @@ const Page = () => {
                   alt="Sedan"
                   className="w-full h-32 object-cover mb-2 rounded-md"
                 />
-                <h3 className="font-semibold text-lg">Sedan</h3>
-                <p className="text-sm text-gray-600">4+1 Seater</p>
+                <h3 className="font-semibold text-lg">Hatchback</h3>
+                <p className="text-sm text-gray-600">3+1 Seater</p>
               </div>
 
               {/* Card 3 */}
@@ -427,8 +427,8 @@ const Page = () => {
                   alt="SUV"
                   className="w-full h-32 object-cover mb-2 rounded-md"
                 />
-                <h3 className="font-semibold text-lg">SUV</h3>
-                <p className="text-sm text-gray-600">6+1 Seater</p>
+                <h3 className="font-semibold text-lg">Seden</h3>
+                <p className="text-sm text-gray-600">4+1 Seater</p>
               </div>
 
               {/* Card 4 */}
@@ -438,8 +438,8 @@ const Page = () => {
                   alt="SUV+"
                   className="w-full h-32 object-cover mb-2 rounded-md"
                 />
-                <h3 className="font-semibold text-lg">SUV+</h3>
-                <p className="text-sm text-gray-600">6+1 Seater</p>
+                <h3 className="font-semibold text-lg">Seden</h3>
+                <p className="text-sm text-gray-600">4+1 Seater</p>
               </div>
             </div>
 

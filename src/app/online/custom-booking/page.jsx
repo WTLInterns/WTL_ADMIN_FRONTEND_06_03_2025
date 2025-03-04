@@ -26,7 +26,7 @@ const Bookings = () => {
   // Bookings from backend
   const [bookings, setBookings] = useState([]);
 
-  // Filter state for trip type (all, One Way, Round Trip)
+  // Filter state for trip type (all, oneWay, roundTrip)
   const [filterTrip, setFilterTrip] = useState("all");
 
   // Form submission handler (ensuring bookingType is set to "custom_booking")
@@ -36,8 +36,9 @@ const Bookings = () => {
       alert("Please fill in all required fields.");
       return;
     }
+
     const bookingData = {
-      bookingType: "custom_booking", // enforce custom booking type
+      bookingType: "custom_booking",
       tripType,
       userPickup,
       userDrop,
@@ -49,19 +50,22 @@ const Bookings = () => {
     };
 
     try {
-      const response = await fetch("http://localhost:8080/customBooking", {
+      const response = await fetch("http://localhost:8080/customBooking/b", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/json", // Ensure no charset=UTF-8
+          Accept: "application/json",
         },
         body: JSON.stringify(bookingData),
       });
+
       if (response.ok) {
         const newBooking = await response.json();
         setBookings([...bookings, newBooking]);
         setIsFormOpen(false);
       } else {
-        console.error("Failed to add booking");
+        const errorMessage = await response.text();
+        console.error("Failed to add booking:", errorMessage);
       }
     } catch (error) {
       console.error("Error while adding booking", error);
@@ -152,7 +156,7 @@ const Bookings = () => {
           >
             <option value="all">All Bookings</option>
             <option value="oneWay">One Way</option>
-            <option value="Round Trip">Round Trip</option>
+            <option value="roundTrip">Round Trip</option>
           </select>
         </div>
 
@@ -175,7 +179,7 @@ const Bookings = () => {
                   Trip Type:
                 </label>
                 <div className="flex items-center space-x-4">
-                  {["One Way", "Round Trip"].map((type) => (
+                  {["oneWay", "roundTrip"].map((type) => (
                     <label key={type} className="flex items-center space-x-2">
                       <input
                         type="radio"
@@ -225,7 +229,7 @@ const Bookings = () => {
                     onChange={(e) => setTime(e.target.value)}
                   />
                 </div>
-                {tripType === "Round Trip" && (
+                {tripType === "roundTrip" && (
                   <div>
                     <label className="block text-gray-600">Return Date:</label>
                     <input
