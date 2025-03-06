@@ -36,7 +36,7 @@ const AllVendors = () => {
       setLoading(true);
       try {
         const response = await fetch(
-          "https://worldtriplink.com/vendors/allVendors"
+          "http://localhost:8080/vendors/allVendors"
         );
         const data = await response.json();
         setVendors(data);
@@ -66,7 +66,7 @@ const AllVendors = () => {
     });
 
     try {
-      const response = await fetch("https://worldtriplink.com/vendors/add", {
+      const response = await fetch("http://localhost:8080/vendors/add", {
         method: "POST",
         body: formData,
       });
@@ -109,7 +109,7 @@ const AllVendors = () => {
 
     try {
       const response = await fetch(
-        `https://worldtriplink.com/vendors/delete/${vendorId}`,
+        `http://localhost:8080/vendors/delete/${vendorId}`,
         {
           method: "DELETE",
         }

@@ -76,7 +76,7 @@ const page = () => {
 
   useEffect(() => {
     // Fetching data from the backend
-    fetch("https://worldtriplink.com/driverAdmin/all") // Make sure this URL matches your backend API
+    fetch("http://localhost:8080/driverAdmin/all") // Make sure this URL matches your backend API
       .then((response) => response.json())
       .then((data) => setDriver(data))
       .catch((error) => console.error("Error fetching vehicles:", error));

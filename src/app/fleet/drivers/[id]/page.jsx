@@ -21,7 +21,7 @@ const ArrowPage = () => {
   // Fetching data from the backend
   useEffect(() => {
     axios
-      .get(`https://worldtriplink.com/driverAdmin/${params.id}`)
+      .get(`http://localhost:8080/driverAdmin/${params.id}`)
       .then((response) => {
         console.log("Fetched cab data:", response.data); // Debugging
         setCab(response.data);
@@ -38,7 +38,7 @@ const ArrowPage = () => {
 
     axios
       .put(
-        `https://worldtriplink.com/driverAdmin/${params.id}/status`,
+        `http://localhost:8080/driverAdmin/${params.id}/status`,
         { status },
         {
           headers: {
@@ -83,7 +83,7 @@ const ArrowPage = () => {
           <div className="w-1/2 h-[500px] flex flex-col justify-center items-center">
             {cab.driverImgSelfie ? (
               <img
-                src={`https://worldtriplink.com/images/driverAdminImg/${cab.driverImgSelfie}`}
+                src={`http://localhost:8080/images/driverAdminImg/${cab.driverImgSelfie}`}
                 alt="Driver Selfie"
                 className="w-full h-full object-cover"
               />
@@ -97,7 +97,7 @@ const ArrowPage = () => {
                 <div key={field} className="flex flex-col items-center">
                   {cab[field] ? (
                     <img
-                      src={`https://worldtriplink.com/images/driverAdminImg/${cab[field]}`}
+                      src={`http://localhost:8080/images/driverAdminImg/${cab[field]}`}
                       alt={field}
                       className="w-16 h-16 object-cover"
                     />
@@ -157,7 +157,7 @@ const ArrowPage = () => {
               {/* Dynamic Image Rendering */}
               {imageFields[modalTitle] && cab[imageFields[modalTitle]] ? (
                 <img
-                  src={`https://worldtriplink.com/images/driverAdminImg/${
+                  src={`http://localhost:8080/images/driverAdminImg/${
                     cab[imageFields[modalTitle]]
                   }`}
                   alt={modalTitle}

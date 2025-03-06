@@ -115,7 +115,7 @@ const Page = () => {
 
     try {
       const response = await axios.post(
-        "https://worldtriplink.com/cabAdmin/save",
+        "http://localhost:8080/cabAdmin/save",
         data,
         {
           headers: {
@@ -138,7 +138,7 @@ const Page = () => {
 
   useEffect(() => {
     // Fetching data from the backend
-    fetch("https://worldtriplink.com/cabAdmin/all") // Make sure this URL matches your backend API
+    fetch("http://localhost:8080/cabAdmin/all") // Make sure this URL matches your backend API
       .then((response) => response.json())
       .then((data) => {
         setCab(data);
