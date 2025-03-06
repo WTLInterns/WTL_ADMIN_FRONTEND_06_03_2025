@@ -26,7 +26,7 @@ const PasswordResetPage = () => {
     setLoading(true);
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/password-reset/request-reset",
+        "https://worldtriplink.com/api/password-reset/request-reset",
         null,
         { params: { email } }
       );
@@ -43,7 +43,7 @@ const PasswordResetPage = () => {
     setLoading(true);
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/password-reset/verify-otp",
+        "https://worldtriplink.com/api/password-reset/verify-otp",
         null,
         { params: { email, otp } }
       );
@@ -65,7 +65,7 @@ const PasswordResetPage = () => {
     setLoading(true);
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/password-reset/reset-password",
+        "https://worldtriplink.com/api/password-reset/reset-password",
         null,
         { params: { email, newPassword } }
       );

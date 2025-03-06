@@ -42,7 +42,7 @@
 //     loadGoogleMapsAPI();
 
 //     // Fetch initial state data
-//     fetch("http://localhost:8080/api/states")
+//     fetch("https://worldtriplink.com/api/states")
 //       .then((res) => res.json())
 //       .then((data) => {
 //         setStates(data);
@@ -70,7 +70,7 @@
 //   const handleStateChange = async (stateId) => {
 //     setSelectedState(stateId);
 //     try {
-//       const response = await fetch(`http://localhost:8080/cities/${stateId}`);
+//       const response = await fetch(`https://worldtriplink.com/cities/${stateId}`);
 //       const data = await response.json();
 //       setCities(data);
 //     } catch (error) {
@@ -81,7 +81,7 @@
 //   const handleDStateChange = async (stateId) => {
 //     setSelectedDState(stateId);
 //     try {
-//       const response = await fetch(`http://localhost:8080/cities/${stateId}`);
+//       const response = await fetch(`https://worldtriplink.com/cities/${stateId}`);
 //       const data = await response.json();
 //       setDCities(data);
 //     } catch (error) {
@@ -158,7 +158,7 @@
 //       suvPlusPrice: prices.suvPlus,
 //     }).toString();
 
-//     const url = `http://localhost:8080/update-prices?${queryString}`;
+//     const url = `https://worldtriplink.com/update-prices?${queryString}`;
 
 //     try {
 //       const response = await fetch(url, {
@@ -346,7 +346,7 @@ const UpdateTripPricing = ({ params }) => {
 
     loadGoogleMapsAPI();
 
-    fetch("http://localhost:8080/api/states")
+    fetch("https://worldtriplink.com/api/states")
       .then((res) => res.json())
       .then((data) => {
         setStates(data);
@@ -374,7 +374,7 @@ const UpdateTripPricing = ({ params }) => {
   const handleStateChange = async (stateId) => {
     setSelectedState(stateId);
     try {
-      const response = await fetch(`http://localhost:8080/cities/${stateId}`);
+      const response = await fetch(`https://worldtriplink.com/cities/${stateId}`);
       const data = await response.json();
       setCities(data);
     } catch (error) {
@@ -385,7 +385,7 @@ const UpdateTripPricing = ({ params }) => {
   const handleDStateChange = async (stateId) => {
     setSelectedDState(stateId);
     try {
-      const response = await fetch(`http://localhost:8080/cities/${stateId}`);
+      const response = await fetch(`https://worldtriplink.com/cities/${stateId}`);
       const data = await response.json();
       setDCities(data);
     } catch (error) {
@@ -461,7 +461,7 @@ const UpdateTripPricing = ({ params }) => {
       suvPlusPrice: prices.suvPlus,
     }).toString();
 
-    const url = `http://localhost:8080/update-prices?${queryString}`;
+    const url = `https://worldtriplink.com/update-prices?${queryString}`;
 
     try {
       const response = await fetch(url, {

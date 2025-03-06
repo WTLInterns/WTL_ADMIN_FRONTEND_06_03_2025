@@ -23,7 +23,7 @@ const Page = () => {
   // Fetch booking details once when bookingId is available
   useEffect(() => {
     if (bookingId) {
-      fetch(`http://localhost:8080/booking/${bookingId}`)
+      fetch(`https://worldtriplink.com/booking/${bookingId}`)
         .then((res) => {
           if (!res.ok) throw new Error("Error fetching booking details");
           return res.json();
@@ -39,7 +39,7 @@ const Page = () => {
     const fetchVendors = async () => {
       try {
         const response = await fetch(
-          "http://localhost:8080/vendors/allVendors"
+          "https://worldtriplink.com/vendors/allVendors"
         );
 
         // Check if the response is OK (status 200)
@@ -61,7 +61,7 @@ const Page = () => {
     try {
       // Make the PUT request to assign the vendor
       const response = await axios.put(
-        `http://localhost:8080/${bookingId}/assignVendor/${vendorId}`
+        `https://worldtriplink.com/${bookingId}/assignVendor/${vendorId}`
       );
 
       // Handle the successful response (booking updated)
@@ -78,7 +78,7 @@ const Page = () => {
   const handleUpdateStatus = async (newStatus) => {
     try {
       const response = await axios.put(
-        `http://localhost:8080/${bookingId}/status`,
+        `https://worldtriplink.com/${bookingId}/status`,
         { status: newStatus } // Send the new status in the request body
       );
       setBooking(response.data); // Update the booking status in state
@@ -91,7 +91,7 @@ const Page = () => {
 
   const handleComplete = () => {
     if (window.confirm("Are you sure you want to mark the trip complete?")) {
-      fetch(`http://localhost:8080/complete-trip/${bookingId}`, {
+      fetch(`https://worldtriplink.com/complete-trip/${bookingId}`, {
         method: "POST",
       })
         .then((res) => {
@@ -108,7 +108,7 @@ const Page = () => {
 
   const handleCancel = () => {
     if (window.confirm("Are you sure you want to cancel the trip?")) {
-      fetch(`http://localhost:8080/cancel-trip/${bookingId}`, {
+      fetch(`https://worldtriplink.com/cancel-trip/${bookingId}`, {
         method: "POST",
       })
         .then((res) => {
