@@ -18,7 +18,7 @@ import {
 } from "react-icons/bs";
 import { FaPeopleGroup, FaChartPie } from "react-icons/fa6";
 
-const Layout = ({ children }) => {
+const Layout = () => {
   const [openDropdown, setOpenDropdown] = useState(null); // Track which dropdown is open
 
   const toggleDropdown = (dropdownKey) => {
@@ -295,7 +295,7 @@ const Layout = ({ children }) => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 p-6">{children}</div>
+      <div className="flex-1 p-6"></div>
     </div>
   );
 };
