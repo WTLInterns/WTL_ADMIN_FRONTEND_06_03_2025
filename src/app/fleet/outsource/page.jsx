@@ -41,7 +41,7 @@ const Page = () => {
 
   useEffect(() => {
     // Fetching data from the backend
-    fetch("http://localhost:8080/vehicle/all") // Make sure this URL matches your backend API
+    fetch("https://worldtriplink.com/vehicle/all") // Make sure this URL matches your backend API
       .then((response) => response.json())
       .then((data) => {
         setSource(data);
@@ -169,7 +169,7 @@ const Page = () => {
                           {" "}
                           {source.carImage && (
                             <img
-                              src={`http://localhost:8080/images/outSourceImg/${source.carImage}`} // Prepend the static URL
+                              src={`https://worldtriplink.com/images/outSourceImg/${source.carImage}`} // Prepend the static URL
                               alt="Car"
                               className="w-16 h-16 object-cover"
                             />
